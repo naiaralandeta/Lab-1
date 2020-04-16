@@ -52,3 +52,25 @@ if __name__ == '__main__':
 	rmsd = get_rmsd(list_c1, list_c2)
 	
 	print 'RMSD:', rmsd
+	
+	
+# Build a Python script for STRUCTURE SUPERIMPOSITION using the class SVDSuperimposer from the biopython libraries.
+
+# Test the script on an group of atoms from the following structures: (They have the same size)
+
+# Human Cytochrome C - Uniprot:P99999.PDB:3ZCF:A - ruta: https://files.rcsb.org/view/3ZCF.pdb para descargarlo desde la terminal usar comando wget
+# Equine Cytochrome C - Uniprot:P00004.PDB:3O20:A - ruta: https://files.rcsb.org/view/3O20.pdb para descargarlo desde la terminal usar el comando wget
+
+# * Script que ocupe poca memoria y que sea rápido
+
+# Comando para cambiar permisos: chmod a+x structure_superimpotion.py y ls -ltr para ver los permisos de los ficheros
+# Siempre import sys
+
+
+# What we have to do?
+# 1. Define our representation - Simplest one is the c-alpha atoms, they should be extracted from SAM files.
+# 2. Input: the structures that you want to superimpos. and the pair of residues that you want to align (correspondences/ references)
+# 3. Extract from the structure the coordinates of c-alpha atoms
+
+# Start programming:
+# - sudo apt-get install python-biopython

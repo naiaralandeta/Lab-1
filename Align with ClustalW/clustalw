@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+# Download from UniProtKB the sequences of the following proteins (in FASTA format)
+# P99999 (human)
+# P00004 (horse)
+# P0C0X8 (Rhodobacter)
+# P00091 (Rhodopseudomonas)
+# Q93VA3 (Arabidopsis)
+
+# Align with ClustalW @ http://clustalw.ddbj.nig.ac.jp/ and http://www.ch.embnet.org/software/ClustalW.html
+
+# 1. Crear una lista con los ids - vi list_id.txt
+# 2. Para descargar todos los fasta - for i in `cat list_id.txt`; do wget https://www.uniprot.org/uniprot/$i.fasta ; done
+# 3. Agrupar todos en una lista - cat *.fasta > list_cyc.fasta
+# 4. Obtener todos los identificadores - grep "^>" list_cyc.fasta | less, pero  grep "^>" list_cyc.fasta | wc -l se obtiene el numero de secuencias
+# 5. Ir a https://www.ebi.ac.uk/Tools/msa/clustalo/ - Protein, select file list_cyc.fasta and submit
+# 6. Obtienes un identificador del job que vale por 7 dias
+# 7. Cuando se obtiene el resultado se da a Download Alignment File
+# 8. Guardar los resultados wget -O list_cyc.aln https://www.ebi.ac.uk/Tools/services/rest/clustalo/result/clustalo-I20200416-150214-0227-81124276-p2m/aln-clustal_num
+
+# ----------------------------------------------------------------------
+
+# Write a script to calculate the information entropy of the MSA and for each column the most conserved residue and its frequency.
+# 1. Extract/parsing the file at getting from the the multiple sequence alingment (MSA) - list_cyc.aln
+#  1.1 Get the identifier of the sequences and get one rown at the time, of the sequence
+
+import sys
+
+def get_aln(aln_file): # Parsing the alignment file
+	dic_aln = {}
+	f = open(aln_file)
+	for line in f:
+		if line.find('sp') != 0 : continue
+		l = line.split()
+		seq_id = l[0]
+		seq = l[1]
+		dic_aln[seq_id] = dic_aln.get(seq_id, '') + seq # si el seq_id no esta lo pondra vacio, asi funciona el get para que no de error
+	return dic_aln
+	
+def get_profile(dic_aln):
+	profile = []
+	return profile
+
+if __name__ == '__main__':
+	aln_file = sys.argv[1]
+	dic_aln = get_aln(aln_file)
+	for seq_id in dic_aln.keys():
+		print seq_id.split('|')[1], dic_aln[seq_id]
+	
+
+
+
