@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-#./structure_superimposition.py 3ZCF.pdb 3O20.pdb A A 1,2,3 1,2,3
+#./structure_superimposition.py 3ZCF.pdb 3O20.pdb A A 1,2,3 1,2,3 // si a la ultima lista se le anyade 4, da error de tamanyo
+# URL: http://biopython.org/DIST/docs/api/Bio.SVDSuperimposer.SVDSuperimposer-class.html
 
 import sys
+from Bio.SVDSuperimposer import SVDSuperimposer
+import numpy as np
 
-def get_ca_atoms(pdbfile, chain, rlist, atom = 'CA'):
+def get_ca_atoms(pdbfile, chain, rlist, atom = 'CA'): # Funcion para obtener todos los carbonos alfa
 	list_coor = []
 	file_pdb = open(pdbfile)
 	for line in file_pdb:
@@ -16,6 +19,19 @@ def get_ca_atoms(pdbfile, chain, rlist, atom = 'CA'):
 		z = float(line[46:54]) # Posicion 47-54  es Real(8.3) - Orthogonal coordinates for Z in Angstroms
 		list_coor.append([x,y,z])
 	return list_coor
+	
+def get_rmsd(coord1, coord2): # Funcion para hacer la superimposicion de las estructuras
+	if len(coord1) != len(coord2):
+		print >> sys.stderr, 'ERROR: The set of coordinates have different size.' # Estandar error
+		sys.exit(1)
+	svd = SVDSuperimposer()
+	svd.set(np.array(coord1), np.array(coord2))
+	svd.run() # run the superimposition
+	rmsd = svd.get_rms() # Da la RMSD de la superimposicion
+	rotation, translation = svd.get_rotran() # Matrix rotation and translation
+	print 'ROTATION:', rotation
+	print 'TRANSLATION:', translation
+	return rmsd
 
 if __name__ == '__main__':
 	pdbfile1 = sys.argv[1]
@@ -32,3 +48,7 @@ if __name__ == '__main__':
 	
 	print 'Coordination 1: ', list_c1
 	print 'Coordination 2: ', list_c2
+
+	rmsd = get_rmsd(list_c1, list_c2)
+	
+	print 'RMSD:', rmsd
