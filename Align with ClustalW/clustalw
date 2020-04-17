@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Download from UniProtKB the sequences of the following proteins (in FASTA format)
+
 # P99999 (human)
 # P00004 (horse)
 # P0C0X8 (Rhodobacter)
@@ -25,6 +26,7 @@
 #  1.1 Get the identifier of the sequences and get one rown at the time, of the sequence
 
 import sys
+import numpy as np
 
 def get_aln(aln_file): # Parsing the alignment file
 	dic_aln = {}
@@ -39,13 +41,41 @@ def get_aln(aln_file): # Parsing the alignment file
 	
 def get_profile(dic_aln):
 	profile = []
+	n = len(dic_aln.values()[0]) 		# todas las secuencias que estan alineadas tienen que tener la misma length, se obtiene del primer elemento del dic
+	seq_ids = dic_aln.keys() 			# vector con todas las keys del dic
+	
+	for i in range(n): 					# recorrer toda las columnas
+		aa = [dic_aln[j][i] for j in seq_ids] # anyade el alineamiento de todas las sequencias por aa en la misma posicion
+		v_aa = get_site_profile(aa)
+		total = float(v_aa[:20].sum())  # este ultimo muestra la frecuencia
+		v_aa[:20] = v_aa[:20] / total	# anyadir la frecuenia al vector de aa
+		profile.append(v_aa)
 	return profile
+	
+def get_site_profile(aa, aa_list ='ACDEFGHIKLMNPQRSTVWY-'):		 # funcion input aa list y transforma en un vector de 20 o 21 elementos
+	v = np.zeros(len(aa_list))
+	for a in aa:
+		pos = aa_list.find(a)
+		if pos > -1: v[pos] += 1 								 # devuelve un vector con las el conteo de cada letra que encuentra en el alineamiento
+	return v 
+	
+def print_profile(profile, aa_list ='ACDEFGHIKLMNPQRSTVWY-'):
+	n = len(profile)
+	for i in range(n):
+		pi = profile[i][:20]
+		s = 0.0  											# Entropy
+		for j in range(20):
+			if pi[j] > 0: s = s - pi[j] * np.log(pi[j])
+		pi_max = pi.argmax() 								# Maximun probability
+		print i, s, pi_max, aa_list[pi_max]
 
 if __name__ == '__main__':
 	aln_file = sys.argv[1]
 	dic_aln = get_aln(aln_file)
-	for seq_id in dic_aln.keys():
-		print seq_id.split('|')[1], dic_aln[seq_id]
+	profile = get_profile(dic_aln)
+	print_profile(profile)
+	#for seq_id in dic_aln.keys():
+	#	print seq_id.split('|')[1], dic_aln[seq_id]
 	
 
 
